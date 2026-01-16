@@ -595,6 +595,37 @@ def after_request(response):
 
 ## Step 7: Test Your Stack
 
+### Run the Progress Checker
+
+Before starting the stack, check your configuration files:
+
+```bash
+python run.py
+```
+
+**Expected output when complete:**
+```
+============================================================
+  📊 Monitoring Stack Challenge
+============================================================
+
+  ✅ Prometheus Config (20/20 points)
+  ✅ Grafana Datasource (15/15 points)
+  ✅ Grafana Dashboard (25/25 points)
+  ✅ Alertmanager Config (20/20 points)
+  ✅ App Instrumentation (20/20 points)
+
+============================================================
+  🎯 Total Score: 100/100
+  🎉 CHALLENGE COMPLETE!
+============================================================
+```
+
+**If you see less than 100:**
+- Read the missing items (marked with ✗)
+- Check the corresponding step in this README
+- Fix your config files and run again
+
 ### Start Everything
 
 ```bash
