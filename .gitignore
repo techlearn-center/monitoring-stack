@@ -1,0 +1,20 @@
+# Docker
+prometheus_data/
+grafana_data/
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test artifacts
+*_score.txt

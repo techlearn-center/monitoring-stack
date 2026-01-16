@@ -1,0 +1,314 @@
+name: Grade Monitoring Challenge
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  grade:
+    name: Grade Monitoring Stack
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Grade Prometheus Config (20 points)
+        id: prometheus
+        run: |
+          python -c "
+          import yaml
+
+          try:
+              with open('prometheus/prometheus.yml') as f:
+                  content = f.read()
+                  config = yaml.safe_load(content)
+          except Exception as e:
+              print(f'✗ Error loading prometheus.yml: {e}')
+              with open('prometheus_score.txt', 'w') as f:
+                  f.write('0')
+              exit(0)
+
+          points = 0
+          max_points = 20
+
+          # Check scrape_interval (4 points)
+          if config.get('global', {}).get('scrape_interval') == '15s':
+              print('✓ Scrape interval: 15s')
+              points += 4
+          else:
+              print('✗ Scrape interval should be 15s')
+
+          # Check alertmanager (4 points)
+          if config.get('alerting', {}).get('alertmanagers'):
+              print('✓ Alertmanager configured')
+              points += 4
+          else:
+              print('✗ Alertmanager not configured')
+
+          # Check scrape configs (12 points)
+          scrape_configs = config.get('scrape_configs', [])
+          job_names = [job.get('job_name') for job in scrape_configs]
+
+          for job in ['prometheus', 'app', 'node']:
+              if job in job_names:
+                  print(f'✓ Job: {job}')
+                  points += 4
+              else:
+                  print(f'✗ Job missing: {job}')
+
+          print(f'\nPrometheus Score: {points}/{max_points}')
+          with open('prometheus_score.txt', 'w') as f:
+              f.write(str(points))
+          "
+
+      - name: Grade Alertmanager Config (20 points)
+        id: alertmanager
+        run: |
+          python -c "
+          import yaml
+
+          try:
+              with open('alertmanager/alertmanager.yml') as f:
+                  config = yaml.safe_load(f)
+          except Exception as e:
+              print(f'✗ Error loading alertmanager.yml: {e}')
+              with open('alertmanager_score.txt', 'w') as f:
+                  f.write('0')
+              exit(0)
+
+          points = 0
+          max_points = 20
+
+          # Check route (5 points)
+          if config.get('route'):
+              print('✓ Route configured')
+              points += 5
+          else:
+              print('✗ Route not configured')
+
+          # Check receivers (5 points)
+          if config.get('receivers'):
+              print('✓ Receivers defined')
+              points += 5
+          else:
+              print('✗ Receivers not defined')
+
+          # Check group_by (5 points)
+          if config.get('route', {}).get('group_by'):
+              print('✓ Group by configured')
+              points += 5
+          else:
+              print('✗ Group by not configured')
+
+          # Check inhibit_rules (5 points)
+          if config.get('inhibit_rules'):
+              print('✓ Inhibit rules defined')
+              points += 5
+          else:
+              print('✗ Inhibit rules not defined')
+
+          print(f'\nAlertmanager Score: {points}/{max_points}')
+          with open('alertmanager_score.txt', 'w') as f:
+              f.write(str(points))
+          "
+
+      - name: Grade Grafana Datasource (15 points)
+        id: grafana_ds
+        run: |
+          python -c "
+          import yaml
+
+          try:
+              with open('grafana/provisioning/datasources/prometheus.yml') as f:
+                  config = yaml.safe_load(f)
+          except Exception as e:
+              print(f'✗ Error loading datasource config: {e}')
+              with open('grafana_ds_score.txt', 'w') as f:
+                  f.write('0')
+              exit(0)
+
+          points = 0
+          max_points = 15
+
+          datasources = config.get('datasources', [])
+
+          if not datasources:
+              print('✗ No datasources defined')
+              with open('grafana_ds_score.txt', 'w') as f:
+                  f.write('0')
+              exit(0)
+
+          ds = datasources[0]
+
+          # Check type (5 points)
+          if ds.get('type') == 'prometheus':
+              print('✓ Type: prometheus')
+              points += 5
+          else:
+              print('✗ Wrong type')
+
+          # Check URL (5 points)
+          if ds.get('url') == 'http://prometheus:9090':
+              print('✓ URL correct')
+              points += 5
+          else:
+              print('✗ Wrong URL')
+
+          # Check isDefault (5 points)
+          if ds.get('isDefault') == True:
+              print('✓ Is default')
+              points += 5
+          else:
+              print('✗ Not set as default')
+
+          print(f'\nGrafana Datasource Score: {points}/{max_points}')
+          with open('grafana_ds_score.txt', 'w') as f:
+              f.write(str(points))
+          "
+
+      - name: Grade Dashboard (25 points)
+        id: dashboard
+        run: |
+          python -c "
+          import json
+
+          try:
+              with open('grafana/dashboards/app-dashboard.json') as f:
+                  dashboard = json.load(f)
+          except Exception as e:
+              print(f'✗ Error loading dashboard: {e}')
+              with open('dashboard_score.txt', 'w') as f:
+                  f.write('0')
+              exit(0)
+
+          points = 0
+          max_points = 25
+
+          # Valid JSON (5 points)
+          print('✓ Valid JSON')
+          points += 5
+
+          # Check panels (5 points)
+          panels = dashboard.get('panels', [])
+          if len(panels) >= 4:
+              print(f'✓ {len(panels)} panels')
+              points += 5
+          else:
+              print(f'✗ Only {len(panels)} panels (need 4+)')
+
+          # Check for real PromQL queries (15 points)
+          real_queries = 0
+          placeholders = 0
+          for panel in panels:
+              for target in panel.get('targets', []):
+                  expr = target.get('expr', '')
+                  if 'REPLACE_WITH' in expr:
+                      placeholders += 1
+                  elif expr:
+                      real_queries += 1
+
+          if real_queries >= 4 and placeholders == 0:
+              print(f'✓ {real_queries} real PromQL queries')
+              points += 15
+          elif real_queries > 0:
+              print(f'~ {real_queries} queries, {placeholders} placeholders')
+              points += min(real_queries * 3, 10)
+          else:
+              print('✗ No real PromQL queries')
+
+          print(f'\nDashboard Score: {points}/{max_points}')
+          with open('dashboard_score.txt', 'w') as f:
+              f.write(str(points))
+          "
+
+      - name: Grade Alert Rules (20 points)
+        id: alerts
+        run: |
+          python -c "
+          import yaml
+
+          try:
+              with open('prometheus/rules/alerts.yml') as f:
+                  config = yaml.safe_load(f)
+          except Exception as e:
+              print(f'✗ Error loading alerts: {e}')
+              with open('alerts_score.txt', 'w') as f:
+                  f.write('0')
+              exit(0)
+
+          points = 0
+          max_points = 20
+
+          groups = config.get('groups', [])
+          rules = []
+          for group in groups:
+              rules.extend(group.get('rules', []))
+
+          alert_names = [r.get('alert') for r in rules]
+
+          required = ['HighErrorRate', 'HighLatency', 'ServiceDown', 'HighCPUUsage']
+          for alert in required:
+              if alert in alert_names:
+                  print(f'✓ Alert: {alert}')
+                  points += 5
+              else:
+                  print(f'✗ Missing: {alert}')
+
+          print(f'\nAlert Rules Score: {points}/{max_points}')
+          with open('alerts_score.txt', 'w') as f:
+              f.write(str(points))
+          "
+
+      - name: Calculate Total Score
+        run: |
+          PROMETHEUS=$(cat prometheus_score.txt)
+          ALERTMANAGER=$(cat alertmanager_score.txt)
+          GRAFANA_DS=$(cat grafana_ds_score.txt)
+          DASHBOARD=$(cat dashboard_score.txt)
+          ALERTS=$(cat alerts_score.txt)
+
+          TOTAL=$((PROMETHEUS + ALERTMANAGER + GRAFANA_DS + DASHBOARD + ALERTS))
+          MAX=100
+
+          echo ""
+          echo "═══════════════════════════════════════════"
+          echo "        MONITORING STACK CHALLENGE          "
+          echo "═══════════════════════════════════════════"
+          echo ""
+          echo "  📊 Prometheus:      $PROMETHEUS/20 points"
+          echo "  🔔 Alertmanager:    $ALERTMANAGER/20 points"
+          echo "  📈 Grafana DS:      $GRAFANA_DS/15 points"
+          echo "  🖼️  Dashboard:       $DASHBOARD/25 points"
+          echo "  ⚠️  Alert Rules:     $ALERTS/20 points"
+          echo ""
+          echo "───────────────────────────────────────────"
+          echo "  📊 TOTAL SCORE: $TOTAL/$MAX points"
+          echo "───────────────────────────────────────────"
+          echo ""
+
+          if [ $TOTAL -eq $MAX ]; then
+            echo "  🎉 PERFECT SCORE! You mastered monitoring!"
+          elif [ $TOTAL -ge 80 ]; then
+            echo "  ✨ Great job! Your monitoring stack is solid!"
+          elif [ $TOTAL -ge 60 ]; then
+            echo "  📈 Good progress! Keep improving!"
+          else
+            echo "  💪 Keep practicing! Check the README for hints."
+          fi
+          echo ""
+
+          # Fail if not passing
+          if [ $TOTAL -lt 60 ]; then
+            exit 1
+          fi

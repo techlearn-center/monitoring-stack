@@ -1,0 +1,22 @@
+# Grafana Data Sources - STARTER FILE
+# ====================================
+# TODO: Configure Prometheus data source!
+#
+# Requirements:
+# - Name: Prometheus
+# - Type: prometheus
+# - URL: http://prometheus:9090
+# - Set as default
+#
+# See README.md Step 3 for guidance!
+
+apiVersion: 1
+
+datasources:
+  # TODO: Configure Prometheus data source
+  # - name: Prometheus
+  #   type: prometheus
+  #   access: proxy
+  #   url: http://prometheus:9090
+  #   isDefault: true
+  #   editable: false

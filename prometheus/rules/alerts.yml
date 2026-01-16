@@ -1,0 +1,57 @@
+# Alert Rules - STARTER FILE
+# ==========================
+# TODO: Define alert rules!
+#
+# Requirements:
+# - HighErrorRate: > 5% errors
+# - HighLatency: P95 > 1 second
+# - ServiceDown: target not responding
+# - HighCPUUsage: > 80%
+#
+# See README.md Step 5 for guidance!
+
+groups:
+  - name: app_alerts
+    rules:
+      # TODO: Add HighErrorRate alert
+      # - alert: HighErrorRate
+      #   expr: |
+      #     sum(rate(http_requests_total{status=~"5.."}[5m]))
+      #     /
+      #     sum(rate(http_requests_total[5m]))
+      #     * 100 > 5
+      #   for: 2m
+      #   labels:
+      #     severity: warning
+      #   annotations:
+      #     summary: "High error rate detected"
+
+      # TODO: Add HighLatency alert
+      # - alert: HighLatency
+      #   expr: |
+      #     histogram_quantile(0.95,
+      #       sum(rate(http_request_duration_seconds_bucket[5m])) by (le)
+      #     ) > 1
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #   annotations:
+      #     summary: "High latency detected"
+
+      # TODO: Add ServiceDown alert
+      # - alert: ServiceDown
+      #   expr: up == 0
+      #   for: 1m
+      #   labels:
+      #     severity: critical
+      #   annotations:
+      #     summary: "Service {{ $labels.job }} is down"
+
+      # TODO: Add HighCPUUsage alert
+      # - alert: HighCPUUsage
+      #   expr: rate(process_cpu_seconds_total[5m]) * 100 > 80
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #   annotations:
+      #     summary: "High CPU usage"

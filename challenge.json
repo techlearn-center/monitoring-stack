@@ -1,0 +1,50 @@
+{
+  "id": "monitoring-stack",
+  "title": "Monitoring Stack",
+  "description": "Set up a complete monitoring stack with Prometheus for metrics collection and Grafana for visualization.",
+  "level": 3,
+  "track": "devops",
+  "difficulty": "intermediate",
+  "estimated_time": "3-4 hours",
+  "prerequisites": [
+    "kubernetes-basics"
+  ],
+  "skills": [
+    "prometheus",
+    "grafana",
+    "alertmanager",
+    "promql",
+    "observability",
+    "metrics",
+    "dashboards"
+  ],
+  "tools_required": [
+    "docker",
+    "docker-compose"
+  ],
+  "points": {
+    "prometheus_config": 20,
+    "alertmanager_config": 20,
+    "grafana_datasource": 15,
+    "grafana_dashboard": 25,
+    "alert_rules": 20,
+    "total": 100
+  },
+  "passing_score": 60,
+  "files_to_complete": [
+    "prometheus/prometheus.yml",
+    "alertmanager/alertmanager.yml",
+    "grafana/provisioning/datasources/prometheus.yml",
+    "grafana/dashboards/app-dashboard.json",
+    "prometheus/rules/alerts.yml"
+  ],
+  "learning_outcomes": [
+    "Understand observability and the three pillars (metrics, logs, traces)",
+    "Configure Prometheus for metrics collection",
+    "Write PromQL queries",
+    "Create Grafana dashboards",
+    "Configure alerting with Prometheus and Alertmanager",
+    "Understand the RED and USE monitoring methods",
+    "Instrument applications with Prometheus client libraries"
+  ]
+}

@@ -1,0 +1,49 @@
+# Alertmanager Configuration - STARTER FILE
+# ==========================================
+# TODO: Configure alert routing!
+#
+# Requirements:
+# - Default receiver that logs alerts
+# - Route critical alerts differently
+# - Group alerts by alertname
+#
+# See README.md Step 5 for guidance!
+
+global:
+  # TODO: Configure global settings (optional)
+  # smtp_smarthost: 'localhost:25'
+  # smtp_from: 'alertmanager@example.org'
+
+route:
+  # TODO: Configure routing
+  receiver: 'default'
+  group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+
+  # TODO: Add route for critical alerts
+  # routes:
+  #   - match:
+  #       severity: critical
+  #     receiver: 'critical'
+
+receivers:
+  # Default receiver (webhook for testing)
+  - name: 'default'
+    webhook_configs:
+      - url: 'http://localhost:5001/webhook'
+        send_resolved: true
+
+  # TODO: Add additional receivers
+  # - name: 'critical'
+  #   webhook_configs:
+  #     - url: 'http://localhost:5001/webhook-critical'
+
+# Inhibition rules (optional)
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname']

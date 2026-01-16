@@ -1,0 +1,44 @@
+# Prometheus Configuration - STARTER FILE
+# ========================================
+# TODO: Complete this configuration!
+#
+# Requirements:
+# - Set global scrape_interval to 15s
+# - Configure alertmanager connection
+# - Add scrape job for prometheus itself
+# - Add scrape job for the sample app
+# - Add scrape job for node-exporter
+#
+# See README.md Step 2 for guidance!
+
+global:
+  # TODO: Set scrape interval
+  scrape_interval: 60s  # Change this to 15s!
+  evaluation_interval: 15s
+
+# TODO: Configure alertmanager
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets:
+#             - alertmanager:9093
+
+# TODO: Add rule files
+# rule_files:
+#   - /etc/prometheus/rules/*.yml
+
+scrape_configs:
+  # TODO: Add job to scrape Prometheus itself
+  # - job_name: 'prometheus'
+  #   static_configs:
+  #     - targets: ['localhost:9090']
+
+  # TODO: Add job to scrape the sample app
+  # - job_name: 'app'
+  #   static_configs:
+  #     - targets: ['app:5000']
+
+  # TODO: Add job to scrape node-exporter
+  # - job_name: 'node'
+  #   static_configs:
+  #     - targets: ['node-exporter:9100']
